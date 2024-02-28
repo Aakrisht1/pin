@@ -1,0 +1,42 @@
+<% include ./partials/header.ejs %>
+    <div class="profile w-full min-h-screen bg-zinc-800 text-white pt-1">
+        <div class="profdets flex flex-col items-center mt-14">
+            <div class="relative">
+                <div class="w-40 h-40 bg-zinc-200 rounded-full overflow-hidden">
+                    <img class="w-full h-full object-cover" src="/images/uploads/<%= user.profileImage %>" alt="">
+                </div>
+            </div>
+            <h1 class="text-3xl font-semibold mt-5"><%= user.name %></h1>
+            <h3 class="text-lg mt-2">@<%= user.username %></h3>
+            <div class="flex gap-12 text-lg mt-5">
+                <div class="flex flex-col items-center justify-center">
+                    <h3><%= user.followers.length %></h3>
+                    <h4>Followers</h4>
+                </div>
+                <div class="flex flex-col items-center justify-center">
+                    <h3><%= user.following.length %></h3>
+                    <h4>Following</h4>
+                </div>
+            </div>
+            <div class="px-6 mt-5 flex gap-1">
+                <% if(user.following.indexOf(user._id) === -1){ %>
+                    <a class="px-6 py-2 bg-blue-500 text-xs rounded-md" href="/follow/<%= user._id %>">Follow</a>
+                <% } else { %>
+                    <a class="px-6 py-2 bg-zinc-800 text-xs rounded-md" href="/follow/<%= user._id %>">Following</a>
+                <% } %>
+              </div>
+        </div>
+        <div class="cards flex flex-wrap gap-14 px-[72px] mt-10">
+            <div class="cards flex flex-wrap gap-10">
+                <% user.posts.forEach(function(elem){ %>
+                    <div class="card w-32">
+                        <div class="w-full h-40 bg-zinc-700 rounded-lg overflow-hidden">
+                            <a href="/card/<%= elem.id %>"><img class="w-full h-full object-cover" src="/images/uploads/<%= elem.image %>" alt=""></a>
+                        </div>
+                        <h5 class="mt-2 text-sm"><%= elem.title %></h5>
+                    </div>
+                <% }) %>
+            </div>
+        </div>
+    </div>
+<% include ./partials/footer.ejs %>
