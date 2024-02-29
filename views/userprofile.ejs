@@ -19,10 +19,10 @@
                 </div>
             </div>
             <div class="px-6 mt-5 flex gap-1">
-                <% if(user.following.indexOf(user._id) === -1){ %>
-                    <a class="px-6 py-2 bg-blue-500 text-xs rounded-md" href="/follow/<%= user._id %>">Follow</a>
+                <% if(userSess.following.indexOf(user._id) === -1){ %>
+                    <a class="px-6 py-2 bg-blue-500 text-xs rounded-md border border-white" href="/follow/<%= user._id %>">Follow</a>
                 <% } else { %>
-                    <a class="px-6 py-2 bg-zinc-800 text-xs rounded-md" href="/follow/<%= user._id %>">Following</a>
+                    <a class="px-6 py-2 bg-zinc-900 text-xs rounded-md border border-white" href="/follow/<%= user._id %>">Following</a>
                 <% } %>
               </div>
         </div>

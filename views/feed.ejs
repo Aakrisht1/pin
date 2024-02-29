@@ -7,7 +7,12 @@
                         <a href="/card/<%= elem.id %>"><img class="w-full h-full object-cover" src="/images/uploads/<%= elem.image %>" alt="">                        </a>
                     </div>
                     <h5 class="mt-2 text-sm"><%= elem.title %></h5>
-                    <a href="/userprofile/<%= elem.user.username %>"><h6 class="text-sm font-semibold opacity-50">@<%= elem.user.username %></h6></a>
+                    <% if(user.username === elem.user.username ){ %>
+                        <a href="/profile">
+                    <% }else{ %>  
+                        <a href="/userprofile/<%= elem.user.username %>">
+                    <% } %>
+                    <h6 class="text-sm font-semibold opacity-50">@<%= elem.user.username %></h6></a>
                 </div>
             <% }) %>
         </div>

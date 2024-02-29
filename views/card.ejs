@@ -5,17 +5,13 @@
                 <img class="rounded-lg" src="/images/uploads/<%= post.image %>" alt="">
                 <div class="w-full flex items-center justify-center gap-16">
                     <div class="flex">
-                        <button class="my-[10px]" onclick=(e) => {
-                          e.preventDefault();
-                          
-                          }
-                        >
+                        <a class="my-[10px]" href="/like/post/<%= post._id %>">
                             <% if(post.likes.indexOf(user._id) === -1){ %>
                                 <i class="heart ri-heart-3-line ri-xl mx-3 text-white"></i>
                                 <% } else { %>
                                   <i class="heart ri-heart-3-fill text-red-500 ri-xl mx-3"></i>
                                   <% } %>
-                        </button>
+                        </a>
                         <div class="w-2">
                             <h1 class="my-2 text-xl text-white" id="likeCount"><%= post.likes.length %></h1>
                         </div>
@@ -33,12 +29,17 @@
                               <% } %>
                     </a>
                     
-                    <h2 class="text-xs text-end text-white">Created <%=  new Date(post.date).toDateString() %> ago</h2>
+                    <h2 class="text-xs text-end text-white">Created <%=  new Date(post.date).toDateString(); %> ago</h2>
                 </div>
             </div>
             <div class="w-[50%] h-full">
                 <div class="text-white w-full min-h-10 flex items-center">
-                    <h2 class="ml-7 py-3 text-xl italic">Pin created by : <a href="/userprofile/<%= post.user.username %>" class="font-semibold">@<%= post.user.username %></a></h2>
+                    <h2 class="ml-7 py-3 text-xl italic">Pin created by : <% if(user.username === post.user.username ){ %>
+                      <a href="/profile">
+                    <% }
+                     else{ %>  
+                      <a href="/userprofile/<%= post.user.username %>">
+                      <% } %>@<%= post.user.username %></a></h2>
                 </div>
                 <hr class="ml-[5%] opacity-30 w-[90%]">
                 <div class="text-white w-full min-h-10 flex items-center">
@@ -57,18 +58,12 @@ const copyLink = document.querySelector('#copy-link-button');
 
 // console.log(post._id);
 
-const onClick = (e) => {
-  e.preventDefault();
-  axios.post("/like/post/:id" , likes = post.likes.length + 1)
-}
-
 // Add an event listener for the click event
 copyLink.addEventListener('click', async (event) => {
   event.preventDefault(); // Prevent the default link behavior
 
   // Get the current webpage's URL
   const url = window.location.href;
-
 
   
 

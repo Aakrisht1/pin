@@ -87,9 +87,7 @@ router.get("/saved/posts", isLoggedIn, async function (req, res, next) {
 router.get("/card/:postId", isLoggedIn, async function (req, res, next) {
   const postId = req.params.postId;
   const post = await postModel.findById(postId).populate("user");
-  const user = await userModel
-    .findOne({ username: req.session.passport.user })
-    .populate("posts");
+  const user = await userModel.findOne({ username: req.session.passport.user }).populate("posts");
   res.render("card", {
     postId,
     post,
@@ -112,7 +110,9 @@ router.get("/add", isLoggedIn, async function (req, res, next) {
 
 router.get("/search", isLoggedIn, async function (req, res) {
   let user = await userModel.findOne({ username: req.session.passport.user });
-  res.render("search", { nav: false, user });
+  const userId = req.user._id;
+  
+  res.render("search", { nav: true, user, userId });
 });
 
 router.get("/search/:user", isLoggedIn, async function (req, res) {
@@ -130,7 +130,7 @@ router.post(
   upload.single("postimage"),
   async function (req, res, next) {
     const user = await userModel.findOne({
-      username: req.session.passport.user,
+      username: req.session.passport.user
     });
     const post = await postModel.create({
       user: user._id,
@@ -162,25 +162,22 @@ router.post(
 router.get("/like/post/:id", isLoggedIn, async function (req, res, next) {
   const user = await userModel.findOne({ username: req.session.passport.user });
   const Upost = await postModel.findOne({ _id: req.params.id });
-  const postId = req.params.postId;
+  const postId = req.params.id;
   const post = await postModel.findById(Upost).populate("user");
 
   if (post.likes.indexOf(user._id) === -1) {
     post.likes.push(user._id);
-    l = 1;
   } else {
     post.likes.splice(post.likes.indexOf(user._id), 1);
-    l = 0;
   }
-
   await post.save();
-  res.render("card", { postId, Upost, post, user, nav: true });
+  res.redirect(`/card/${postId}`);
 });
 
 router.get("/save/post/:id", isLoggedIn, async function (req, res, next) {
   const user = await userModel.findOne({ username: req.session.passport.user });
   const Upost = await postModel.findOne({ _id: req.params.id });
-  const postId = req.params.postId;
+  const postId = req.params.id;
   const post = await postModel.findById(Upost).populate("user");
 
   if (post.saved.indexOf(user._id) === -1) {
@@ -195,7 +192,7 @@ router.get("/save/post/:id", isLoggedIn, async function (req, res, next) {
 
   await user.save();
   await post.save();
-  res.render("card", { postId, Upost, post, user, nav: true });
+  res.redirect(`/card/${postId}`);
 });
 
 router.post("/register", function (req, res, next) {
