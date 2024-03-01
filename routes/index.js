@@ -134,11 +134,11 @@ router.get("/post/:postId", isLoggedIn, async function (req, res, next) {
 });
 
 router.delete("/delete/pin/:id", isLoggedIn, async function (req, res, next) {
-    const postId = req.params.id;
-    const result = await postModel.deleteOne({ _id: new mongodb.ObjectId(postId) });
+  const postId = req.params.id;
+  const result = await postModel.deleteOne({ _id: new mongodb.ObjectId(postId) });
+  console.log(result);
+}
 
-    res.redirect("/show/posts");
-  }
 );
 
 router.get("/feed", isLoggedIn, async function (req, res, next) {
@@ -259,7 +259,7 @@ router.post(
     failureRedirect: "/login",
     successRedirect: "/profile",
   }),
-  function (req, res, next) {}
+  function (req, res, next) { }
 );
 
 router.get("/logout", function (req, res, next) {
