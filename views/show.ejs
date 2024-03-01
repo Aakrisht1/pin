@@ -1,7 +1,42 @@
 <% include ./partials/header.ejs %>
     <div class="w-full min-h-screen bg-zinc-800 px-10 py-8 text-white">
-        <div class="cards flex flex-wrap gap-10">
+       <div>
+        <div class="flex items-center justify-center gap-10">
+            <div class="w-40 h-40 bg-zinc-200 rounded-full overflow-hidden">
+                <img class="w-full h-full object-cover" src="/images/uploads/<%= user.profileImage %>" alt="">
+            </div>
+            <div class="w-2/3">
+                <h1 class="text-4xl font-bold"><%= user.username %></h1>
+                <h2 class="text-xl italic"><%= user.email %></h2>
+                <h3 class="text-lg"><%= user.bio %></h3>
+            </div>
+
+        <div>
+            <% if(user.posts.length === 0){ %>
+                <h1 class="text-2xl text-white">No posts yet</h1>
+            <% } %>
+        </div>
+       </div>
+       <div>
+        <div class="flex items-center justify-center gap-10">
+            <div class="flex flex-col items-center justify-center">
+                <h3><%= user.followers.length %></h3>
+                <h4>Followers</h4>
+            </div>
+            <div class="flex flex-col items-center justify-center">
+                <h3><%= user.following.length %></h3>
+                <h4>Following</h4>
+            </div>
+        </div>
+       </div>
+       <div>
+         Your Uploaded Pins
+       </div>
+        <div class="cards mt-8 flex flex-wrap gap-10">
+
             <% user.posts.forEach(function(elem){ %>
+                
+               
                 <div class="card w-32">
                     <div class="w-full h-40 bg-zinc-700 rounded-lg overflow-hidden">
                         <a href="/post/<%= elem.id %>"><img class="w-full h-full object-cover" src="/images/uploads/<%= elem.image %>" alt=""></a>

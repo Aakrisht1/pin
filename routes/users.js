@@ -1,7 +1,10 @@
 const mongoose = require("mongoose");
 const plm = require("passport-local-mongoose");
+require('dotenv').config();
 
-const DB = 'mongodb+srv://Aakrisht:Aakrisht123@cluster0.mong0me.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+
+
+const DB = process.env.DB_URL;
 
 mongoose.connect(DB, {
   useNewUrlParser: true,
@@ -38,13 +41,13 @@ const userSchema = mongoose.Schema({
   followers: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "user" 
-    } 
+      ref: "user"
+    }
   ],
   following: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "user" 
+      ref: "user"
     }
   ]
 });
