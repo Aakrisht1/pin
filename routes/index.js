@@ -6,6 +6,8 @@ const passport = require("passport");
 const localStrategy = require("passport-local");
 const upload = require("./multer");
 const utils = require("../utils/utils");
+const mongodb = require("mongodb");
+const post = require("./post");
 
 passport.use(new localStrategy(userModel.authenticate()));
 
@@ -41,6 +43,23 @@ router.get("/userprofile/:userId", isLoggedIn, async (req, res) => {
   });
   const user = await userModel.findOne({ username: userId }).populate("posts");
   res.render("userprofile", { user, userSess, nav: true });
+});
+
+router.get("/edit", isLoggedIn, async function (req, res) {
+  const user = await userModel.findOne({ username: req.session.passport.user });
+  res.render("edit", { nav: true, user });
+});
+
+router.post("/update", isLoggedIn, async function (req, res) {
+  const user = await userModel.findOneAndUpdate(
+    { username: req.session.passport.user },
+    { username: req.body.username, name: req.body.name, email: req.body.email },
+    { new: true }
+  );
+  req.login(user, function (err) {
+    if (err) throw err;
+    res.redirect("/profile");
+  });
 });
 
 router.get("/follow/:userid", isLoggedIn, async function (req, res) {
@@ -87,7 +106,9 @@ router.get("/saved/posts", isLoggedIn, async function (req, res, next) {
 router.get("/card/:postId", isLoggedIn, async function (req, res, next) {
   const postId = req.params.postId;
   const post = await postModel.findById(postId).populate("user");
-  const user = await userModel.findOne({ username: req.session.passport.user }).populate("posts");
+  const user = await userModel
+    .findOne({ username: req.session.passport.user })
+    .populate("posts");
   res.render("card", {
     postId,
     post,
@@ -96,6 +117,29 @@ router.get("/card/:postId", isLoggedIn, async function (req, res, next) {
     nav: true,
   });
 });
+
+router.get("/post/:postId", isLoggedIn, async function (req, res, next) {
+  const postId = req.params.postId;
+  const post = await postModel.findById(postId).populate("user");
+  const user = await userModel
+    .findOne({ username: req.session.passport.user })
+    .populate("posts");
+  res.render("post", {
+    postId,
+    post,
+    user,
+    date: utils.formatRelativeTime,
+    nav: true,
+  });
+});
+
+router.delete("/delete/pin/:id", isLoggedIn, async function (req, res, next) {
+    const postId = req.params.id;
+    const result = await postModel.deleteOne({ _id: new mongodb.ObjectId(postId) });
+
+    res.redirect("/show/posts");
+  }
+);
 
 router.get("/feed", isLoggedIn, async function (req, res, next) {
   const user = await userModel.findOne({ username: req.session.passport.user });
@@ -111,7 +155,7 @@ router.get("/add", isLoggedIn, async function (req, res, next) {
 router.get("/search", isLoggedIn, async function (req, res) {
   let user = await userModel.findOne({ username: req.session.passport.user });
   const userId = req.user._id;
-  
+
   res.render("search", { nav: true, user, userId });
 });
 
@@ -130,7 +174,7 @@ router.post(
   upload.single("postimage"),
   async function (req, res, next) {
     const user = await userModel.findOne({
-      username: req.session.passport.user
+      username: req.session.passport.user,
     });
     const post = await postModel.create({
       user: user._id,
