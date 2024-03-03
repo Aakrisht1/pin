@@ -16,9 +16,21 @@ mongoose.connect(DB, {
 });
 
 const userSchema = mongoose.Schema({
-  username: String,
-  name: String,
-  email: String,
+  username: {
+    type: String,
+    unique: true,
+    required: true
+  },
+  name: {
+    type: String,
+    unique: false,
+    required: false
+  },
+  email: {
+    type: String,
+    unique: false,
+    required: false
+  },
   password: String,
   profileImage: String,
   boardRefs: [{
@@ -60,6 +72,21 @@ const userSchema = mongoose.Schema({
     },
     username: String,
     // ... other relevant GitHub profile information
+  },
+  google: {
+    id: {
+      type: String,
+      unique: true, // Ensure uniqueness for Google IDs
+      required: false,
+    },
+    username: String,
+    // ... other relevant Google profile information
+  },
+  message: {
+    type: String,
+    unique: false,
+    required: false,
+    default: '',
   }
 });
 

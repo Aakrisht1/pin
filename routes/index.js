@@ -4,11 +4,87 @@ const userModel = require("./users");
 const postModel = require("./post");
 const passport = require("passport");
 const localStrategy = require("passport-local");
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const GitHubStrategy = require("passport-github").Strategy;  // Add GitHubStrategy
 const upload = require("./multer");
 const utils = require("../utils/utils");
 const mongodb = require("mongodb");
 const post = require("./post");
+
+
+passport.use(new GoogleStrategy({
+  clientID: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  callbackURL: process.env.GOOGLE_CALLBACK_URL,
+},
+async (accessToken, refreshToken, profile, done) => {
+  try {
+    // Check if the user already exists in your database
+    const user = await userModel.findOne({ 'google.id': profile.id });
+
+    if (user) {
+      return done(null, user);
+    } 
+    const usernameExists = await userModel.findOne({ username: profile.displayName });
+
+    if (usernameExists) {
+      // Prompt the user to choose a different username
+      const newUser = new userModel({
+        username: generateUniqueUsername(profile.displayName),
+        google: {
+          id: profile.id,
+          // ... other relevant Google profile information
+        },
+        github: {
+          id: profile.id,
+          // ... other relevant Google profile information
+        },
+      });
+
+      await newUser.save();
+      return done(null, newUser);
+    }
+
+    // Create a new user in your database with Google profile information
+    const newUser = new userModel({
+      username: profile.displayName,
+      google: {
+        id: profile.id,
+        // ... other relevant Google profile information
+      },
+      github: {
+        id: profile.id,
+        username: profile.username,
+        // ... other relevant Google profile information
+      },
+    });
+
+    await newUser.save();
+    return done(null, newUser);
+  } catch (err) {
+    return done(err);
+  }
+}));
+
+function generateUniqueUsername(baseUsername) {
+  // You can implement a logic to generate a unique username based on the baseUsername
+  // For example, by appending a number or a unique identifier
+  // This is just a simple example; adjust it based on your requirements
+  const randomNumber1 = Math.floor(Math.random() * 10000);
+  return `${baseUsername}${randomNumber1}`;
+}
+
+
+router.get('/auth/google',
+  passport.authenticate('google', { scope: ['profile', 'email'] }));
+
+router.get('/auth/google/callback',
+  passport.authenticate('google', { failureRedirect: "/", successRedirect: "/profile" }),
+  (req, res) => {
+    // Successful Google authentication
+    res.redirect('/profile', {nav: true});
+  });
+
 
 // GitHub authentication setup
 passport.use(new GitHubStrategy({
@@ -23,27 +99,55 @@ async (accessToken, refreshToken, profile, done) => {
 
     if (user) {
       return done(null, user);
-    } else {
-      // Create a new user in your database with GitHub profile information
+    } // Check if the username already exists
+    const usernameExists = await userModel.findOne({ username: profile.username });
+
+    if (usernameExists) {
+      // Prompt the user to choose a different username
       const newUser = new userModel({
-        username: profile.username,
-        name: profile.displayName,
-        email: profile.emails && profile.emails.length > 0 ? profile.emails[0].value : '',
+        username: generateUniqueUsername(profile.username),
         github: {
           id: profile.id,
-          username: profile.username,
           // ... other relevant GitHub profile information
+        },
+        google: {
+          id: profile.id,
+          // ... other relevant Google profile information
         },
       });
 
       await newUser.save();
       return done(null, newUser);
     }
+
+    // Create a new user in your database with GitHub profile information
+    const newUser = new userModel({
+      username: profile.username,
+      github: {
+        id: profile.id,
+        // ... other relevant GitHub profile information
+      },
+      google: {
+        id: profile.id,
+        username: profile.username,
+        // ... other relevant Google profile information
+      },
+    });
+
+    await newUser.save();
+    return done(null, newUser);
   } catch (err) {
     return done(err);
   }
+}));
+
+function generateUniqueUsername(baseUsername) {
+  // You can implement a logic to generate a unique username based on the baseUsername
+  // For example, by appending a number or a unique identifier
+  // This is just a simple example; adjust it based on your requirements
+  const randomNumber = Math.floor(Math.random() * 1000);
+  return `${baseUsername}${randomNumber}`;
 }
-));
 
 
 passport.use(new localStrategy(userModel.authenticate()));
@@ -78,7 +182,8 @@ router.get("/login", function (req, res, next) {
 });
 
 router.get("/register", function (req, res, next) {
-  res.render("register", { nav: false });
+  const errorMessage = '';
+  res.render("register", {message: errorMessage, nav: false });
 });
 
 router.get("/profile", isLoggedIn, async function (req, res, next) {
@@ -297,19 +402,57 @@ router.get("/save/post/:id", isLoggedIn, async function (req, res, next) {
   res.redirect(`/card/${postId}`);
 });
 
-router.post("/register", function (req, res, next) {
-  const data = new userModel({
-    username: req.body.username,
-    name: req.body.fullname,
-    email: req.body.email,
-  });
+router.post("/register", async function (req, res, next) {
+  try {
+    // Check if the username already exists
+    const usernameExists = await userModel.findOne({ username: req.body.username });
 
-  userModel.register(data, req.body.password).then(function () {
-    passport.authenticate("local")(req, res, function () {
-      res.redirect("/profile");
+    if (usernameExists) {
+      // Prompt the user to choose a different username
+      const errorMessage = 'Username already exists. Please choose a different username.';
+      res.render("register", { message: errorMessage, nav: false });
+      return;
+    }
+
+    // Create a new user in your database
+    const data = new userModel({
+      username: req.body.username,
+      name: req.body.fullname,
+      email: req.body.email,
+      google: {
+        id: req.body.username,
+        username: req.body.username,
+        // ... other relevant Google profile information
+      },
+      github: {
+        id: req.body.username,
+        username: req.body.username,
+        // ... other relevant Google profile information
+      },
     });
-  });
+
+    // Register the user
+    userModel.register(data, req.body.password, (err, user) => {
+      if (err) {
+        // Handle registration error (e.g., display an error message)
+        const errorMessage = 'Registration failed. Please try again.';
+        res.render("register", { message: errorMessage, nav: false });
+        return;
+      }
+
+      // Log in the user after successful registration
+      passport.authenticate("local")(req, res, function () {
+        res.redirect("/profile");
+      });
+    });
+  } catch (err) {
+    // Handle unexpected errors
+    console.error(err);
+    const errorMessage = 'An unexpected error occurred. Please try again.';
+    res.render("register", { message: errorMessage, nav: false });
+  }
 });
+
 
 router.post(
   "/login",
@@ -325,7 +468,7 @@ router.get("/logout", function (req, res, next) {
     if (err) {
       return next(err);
     }
-    res.redirect("/");
+    res.redirect("/",);
   });
 });
 
@@ -333,7 +476,7 @@ function isLoggedIn(req, res, next) {
   if (req.isAuthenticated()) {
     return next();
   }
-  res.redirect("/login");
+  res.redirect("/login", {nav: false});
 }
 
 module.exports = router;
