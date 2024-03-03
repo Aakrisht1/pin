@@ -49,7 +49,18 @@ const userSchema = mongoose.Schema({
       type: mongoose.Schema.Types.ObjectId,
       ref: "user"
     }
-  ]
+  ],
+  provider: String,
+  accountId: String,
+  github: {
+    id: {
+      type: String,
+      unique: true, // Ensure uniqueness for GitHub IDs
+      required: false,
+    },
+    username: String,
+    // ... other relevant GitHub profile information
+  }
 });
 
 userSchema.plugin(plm);

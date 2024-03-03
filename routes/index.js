@@ -1,19 +1,77 @@
-var express = require("express");
-var router = express.Router();
+const express = require("express");
+const router = express.Router();
 const userModel = require("./users");
 const postModel = require("./post");
 const passport = require("passport");
 const localStrategy = require("passport-local");
+const GitHubStrategy = require("passport-github").Strategy;  // Add GitHubStrategy
 const upload = require("./multer");
 const utils = require("../utils/utils");
 const mongodb = require("mongodb");
 const post = require("./post");
 
+// GitHub authentication setup
+passport.use(new GitHubStrategy({
+  clientID: process.env.GITHUB_CLIENT_ID,
+  clientSecret: process.env.GITHUB_CLIENT_SECRET,
+  callbackURL: "http://localhost:3000/auth/github/callback",
+},
+async (accessToken, refreshToken, profile, done) => {
+  try {
+    // Check if the user already exists in your database
+    const user = await userModel.findOne({ 'github.id': profile.id });
+
+    if (user) {
+      return done(null, user);
+    } else {
+      // Create a new user in your database with GitHub profile information
+      const newUser = new userModel({
+        username: profile.username,
+        name: profile.displayName,
+        email: profile.emails && profile.emails.length > 0 ? profile.emails[0].value : '',
+        github: {
+          id: profile.id,
+          username: profile.username,
+          // ... other relevant GitHub profile information
+        },
+      });
+
+      await newUser.save();
+      return done(null, newUser);
+    }
+  } catch (err) {
+    return done(err);
+  }
+}
+));
+
+
 passport.use(new localStrategy(userModel.authenticate()));
+
+// Serialize and deserialize users
+passport.serializeUser(userModel.serializeUser());
+passport.deserializeUser(userModel.deserializeUser());
 
 router.get("/", function (req, res, next) {
   res.render("index", { nav: false });
 });
+
+// ... (rest of your routes)
+
+// GitHub authentication routes
+router.get("/auth/github", passport.authenticate("github"));
+
+router.get("/auth/github/callback",
+  passport.authenticate("github", { failureRedirect: "/", successRedirect: "/profile" }),
+  (req, res) => {
+    // Successful GitHub authentication
+    res.redirect("/profile", {nav: true});
+  }
+);
+
+// ... (rest of your routes)
+
+
 
 router.get("/login", function (req, res, next) {
   res.render("login", { nav: false });
@@ -161,7 +219,7 @@ router.get("/search", isLoggedIn, async function (req, res) {
 
 router.get("/search/:user", isLoggedIn, async function (req, res) {
   const searchTerm = `^${req.params.user}`;
-  const regex = new RegExp(searchTerm);
+  const regex = new RegExp(searchTerm , 'i');
 
   let users = await userModel.find({ username: { $regex: regex } });
 
