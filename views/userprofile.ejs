@@ -3,7 +3,7 @@
         <div class="profdets flex flex-col items-center mt-14">
             <div class="relative">
                 <div class="w-40 h-40 bg-zinc-200 rounded-full overflow-hidden">
-                    <img class="w-full h-full object-cover" src="/images/uploads/<%= user.profileImage %>" alt="">
+                    <img class="w-full h-full object-cover" src="<%= user.profileImage %>" alt="">
                 </div>
             </div>
             <h1 class="text-3xl font-semibold mt-5"><%= user.name %></h1>
@@ -31,7 +31,7 @@
                 <% user.posts.forEach(function(elem){ %>
                     <div class="card w-32">
                         <div class="w-full h-40 bg-zinc-700 rounded-lg overflow-hidden">
-                            <a href="/card/<%= elem.id %>"><img class="w-full h-full object-cover" src="/images/uploads/<%= elem.image %>" alt=""></a>
+                            <a href="/card/<%= elem.id %>"><img class="w-full h-full object-cover" src="<%= elem.image %>" alt=""></a>
                         </div>
                         <h5 class="mt-2 text-sm"><%= elem.title %></h5>
                     </div>

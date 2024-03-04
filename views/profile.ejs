@@ -9,7 +9,7 @@
                     <i class="text-zinc-800 ri-edit-2-fill"></i>
                 </span>
                 <div class="w-40 h-40 bg-zinc-200 rounded-full overflow-hidden">
-                    <img class="w-full h-full object-cover" src="/images/uploads/<%= user.profileImage %>" alt="">
+                    <img class="w-full h-full object-cover" src="<%= user.profileImage %>" alt="">
                 </div>
             </div>
             <h1 class="text-3xl font-semibold mt-5"><%= user.name %></h1>
@@ -32,7 +32,7 @@
                 <a href="/show/posts" class="card">
                     <div class="w-56 h-60 bg-zinc-700 overflow-hidden rounded-lg">
                         <img class="w-full h-full object-cover"
-                            src="/images/uploads/<%= user?.posts[0]?.image %>" alt=" ">
+                            src="<%= user?.posts[0]?.image %>" alt=" ">
                     </div>
                     <h3 class="text-xl font-semibold mt-3">Your Uploaded Pins</h3>
                     <h5 class="text-sm font-medium opacity-60"><%= user.posts.length %> Pins</h5>
@@ -42,7 +42,7 @@
                 <a href="/saved/posts" class="card">
                     <div class="w-56 h-60 bg-zinc-700 overflow-hidden rounded-lg">
                         <img class="w-full h-full object-cover"
-                            src="/images/uploads/<%= userS?.saved[userS.saved.length - 1]?.image %>" alt=" ">
+                            src="<%= userS?.saved[userS.saved.length - 1]?.image %>" alt=" ">
                     </div>
                     <h3 class="text-xl font-semibold mt-3">Saved Pins</h3>
                     <h5 class="text-sm font-medium opacity-60"><%= userS.saved.length %> Pins</h5>

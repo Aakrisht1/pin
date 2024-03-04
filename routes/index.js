@@ -10,6 +10,7 @@ const upload = require("./multer");
 const utils = require("../utils/utils");
 const mongodb = require("mongodb");
 const post = require("./post");
+const cloudinary = require('../utils/cloudinary');
 
 
 passport.use(new GoogleStrategy({
@@ -331,40 +332,48 @@ router.get("/search/:user", isLoggedIn, async function (req, res) {
   res.json(users);
 });
 
-router.post(
-  "/createpost",
-  isLoggedIn,
-  upload.single("postimage"),
-  async function (req, res, next) {
-    const user = await userModel.findOne({
-      username: req.session.passport.user,
-    });
-    const post = await postModel.create({
-      user: user._id,
-      title: req.body.title,
-      description: req.body.description,
-      image: req.file.filename,
-    });
+router.post("/createpost", isLoggedIn, upload.single("postimage"), async function (req, res, next) {
+  try {
+      const result = await cloudinary.uploader.upload(req.file.path);
 
-    user.posts.push(post._id);
-    await user.save();
-    res.redirect("/profile");
-  }
-);
+      const user = await userModel.findOne({
+          username: req.session.passport.user,
+      });
 
-router.post(
-  "/fileupload",
-  isLoggedIn,
-  upload.single("image"),
-  async function (req, res, next) {
-    const user = await userModel.findOne({
-      username: req.session.passport.user,
-    });
-    user.profileImage = req.file.filename;
-    await user.save();
-    res.redirect("/profile");
+      const post = await postModel.create({
+          user: user._id,
+          title: req.body.title,
+          description: req.body.description,
+          image: result.secure_url,
+      });
+
+      user.posts.push(post._id);
+      await user.save();
+
+      res.redirect("/profile");
+  } catch (error) {
+      console.error(error);
+      res.status(500).send("Internal Server Error");
   }
-);
+});
+
+router.post("/fileupload", isLoggedIn, upload.single("image"), async function (req, res, next) {
+  try {
+      const result = await cloudinary.uploader.upload(req.file.path);
+
+      const user = await userModel.findOne({
+          username: req.session.passport.user,
+      });
+
+      user.profileImage = result.secure_url;
+      await user.save();
+
+      res.redirect("/profile");
+  } catch (error) {
+      console.error(error);
+      res.status(500).send("Internal Server Error");
+  }
+});
 
 router.get("/like/post/:id", isLoggedIn, async function (req, res, next) {
   const user = await userModel.findOne({ username: req.session.passport.user });

@@ -4,7 +4,7 @@
             <% posts.forEach(function(elem){ %>
                 <div class="card w-32">
                     <div class="w-full h-40 bg-zinc-700 rounded-lg overflow-hidden">
-                        <a href="/card/<%= elem.id %>"><img class="w-full h-full object-cover" src="/images/uploads/<%= elem.image %>" alt="">                        </a>
+                        <a href="/card/<%= elem.id %>"><img class="w-full h-full object-cover" src="<%= elem.image %>" alt="">                        </a>
                     </div>
                     <h5 class="mt-2 text-sm"><%= elem.title %></h5>
                     <% if(user.username === elem.user.username ){ %>

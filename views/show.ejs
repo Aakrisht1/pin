@@ -3,7 +3,7 @@
        <div>
         <div class="flex items-center justify-center gap-10">
             <div class="w-40 h-40 bg-zinc-200 rounded-full overflow-hidden">
-                <img class="w-full h-full object-cover" src="/images/uploads/<%= user.profileImage %>" alt="">
+                <img class="w-full h-full object-cover" src="<%= user.profileImage %>" alt="">
             </div>
             <div class="w-2/3">
                 <h1 class="text-4xl font-bold"><%= user.username %></h1>
@@ -39,7 +39,7 @@
                
                 <div class="card w-32">
                     <div class="w-full h-40 bg-zinc-700 rounded-lg overflow-hidden">
-                        <a href="/post/<%= elem.id %>"><img class="w-full h-full object-cover" src="/images/uploads/<%= elem.image %>" alt=""></a>
+                        <a href="/post/<%= elem.id %>"><img class="w-full h-full object-cover" src="<%= elem.image %>" alt=""></a>
                     </div>
                     <h5 class="mt-2 text-sm"><%= elem.title %></h5>
                 </div>

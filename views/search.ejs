@@ -24,7 +24,7 @@
                             clutter += `<a href="/userprofile/${item.username}" class="outline-none">
             <div class="text-white flex items-center gap-2 mt-5">
                 <div class="image w-[54px] h-[54px] rounded-full bg-sky-100 overflow-hidden">
-                    <img src="/images/uploads/${item.profileImage}" alt="">
+                    <img class="object-cover w-[54px] h-[54px]" src="${item.profileImage}" alt="">
                     </div>
                 <div class="text">
                     <h3>${item.username}</h3>
