@@ -1,39 +1,44 @@
 <% include ./partials/header.ejs %>
-    <div class="w-full min-h-screen bg-zinc-900 px-4 py-5">
-        <div class="border-2 border-zinc-800 flex items-center justify-between px-2 py-1 rounded-md">
-            <i class="text-white ri-search-line"></i>
-            <input class="input ml-1 w-full bg-zinc-900 outline-none text-zinc-400" type="text"
-                placeholder="search username">
-        </div>
-        <div class="users">
-
+    <div class="w-full min-h-screen bg-zinc-900 ">
+        <hr class="opacity-30 w-full">
+        <div class="w-full min-h-screen bg-zinc-900 px-4 py-5">
+            <div class="border-2 border-zinc-800 flex items-center justify-between px-2 py-1 rounded-md">
+                <i class="text-white ri-search-line"></i>
+                <input class="input ml-1 w-full bg-zinc-900 outline-none text-zinc-400" type="text"
+                    placeholder="search username">
+            </div>
+            <div class="users">
+    
+            </div>
         </div>
     </div>
 
     <script>
         var inp = document.querySelector(".input")
-
+    
         inp.addEventListener("input", function (e) {
             if (inp.value !== '') {
                 fetch(`/search/${inp.value}`)
                     .then(raw => raw.json())
                     .then(result => {
                         let clutter = "";
-
+    
                         result.forEach((item) => {
-                            clutter += `<a href="/userprofile/${item.username}" class="outline-none">
-            <div class="text-white flex items-center gap-2 mt-5">
-                <div class="image w-[54px] h-[54px] rounded-full bg-sky-100 overflow-hidden">
-                    <img class="object-cover w-[54px] h-[54px]" src="${item.profileImage}" alt="">
-                    </div>
-                <div class="text">
-                    <h3>${item.username}</h3>
-                    <h4 class="text-xs opacity-30 leading-none">${item.name}</h4>
-                </div>
-            </div>            
-        </a>`
+                            const profileLink = item.username === '<%= user.username %>' ? '/profile' : `/userprofile/${item.username}`;
+    
+                            clutter += `<a href="${profileLink}" class="outline-none">
+                                <div class="text-white flex items-center gap-2 mt-5">
+                                    <div class="image w-[54px] h-[54px] rounded-full bg-sky-100 overflow-hidden">
+                                        <img class="object-cover w-[54px] h-[54px]" src="${item.profileImage}" alt="">
+                                    </div>
+                                    <div class="text">
+                                        <h3>${item.username}</h3>
+                                        <h4 class="text-xs opacity-30 leading-none">${item.name}</h4>
+                                    </div>
+                                </div>            
+                            </a>`
                         })
-
+    
                         document.querySelector(".users")
                             .innerHTML = clutter;
                     });

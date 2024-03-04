@@ -1,5 +1,7 @@
 <% include ./partials/header.ejs %>
-    <div class="profile w-full min-h-screen bg-zinc-800 text-white pt-1">
+<div class="w-full min-h-screen bg-zinc-900 text-white ">
+    <hr class="opacity-30 w-full">
+    <div class="profile pt-1">
         <form id="uploadform" hidden action="/fileupload" method="post" enctype="multipart/form-data">
             <input type="file" name="image">
         </form>
@@ -50,6 +52,8 @@
             </div>
         </div>
     </div>
+</div>
+    
     <script>
         document.querySelector("#uploadicon").addEventListener("click", function(){
             document.querySelector("#uploadform input").click();
