@@ -1,8 +1,9 @@
 <% include ./partials/header.ejs %>
+<link rel="stylesheet" href="/stylesheets/scroll.css">
 <div class="bg-zinc-900">
   <hr class="opacity-30 w-full">
   <div class="flex items-center justify-center w-full h-[90.8vh]">
-    <div class="bg-zinc-700 w-[60%] absolute z-1 rounded-lg overflow-hidden flex" data-post-id="<%= post._id %>">
+    <div class="bg-zinc-700 w-[60%] relative my-5 z-1 rounded-lg overflow-hidden flex" data-post-id="<%= post._id %>">
         <div class="w-[50%] h-full">
             <img class="rounded-lg" src="<%= post.image %>" alt="">
             <div class="w-full flex items-center justify-center gap-16">
