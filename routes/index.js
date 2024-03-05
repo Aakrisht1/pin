@@ -308,6 +308,7 @@ router.delete("/delete/pin/:id", isLoggedIn, async function (req, res, next) {
 router.get("/feed", isLoggedIn, async function (req, res, next) {
   const user = await userModel.findOne({ username: req.session.passport.user });
   const posts = await postModel.find().populate("user");
+  posts.reverse();
   res.render("feed", { user, posts, nav: true });
 });
 
