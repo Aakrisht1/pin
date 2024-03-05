@@ -32,7 +32,10 @@ const userSchema = mongoose.Schema({
     required: false
   },
   password: String,
-  profileImage: String,
+  profileImage: {
+    type: String,
+    default: "https://www.pngkey.com/png/detail/121-1219231_no-image-png.png"
+  },
   boardRefs: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "post",
