@@ -300,10 +300,13 @@ router.get("/post/:postId", isLoggedIn, async function (req, res, next) {
 router.delete("/delete/pin/:id", isLoggedIn, async function (req, res, next) {
   const postId = req.params.id;
   const result = await postModel.deleteOne({ _id: new mongodb.ObjectId(postId) });
-  console.log(result);
-}
+  
+  const user = await userModel.findOne({ username: req.session.passport.user });
+  user.posts = user.posts.filter(post => post.toString() !== postId);
+  await user.save();
 
-);
+  console.log(result);
+});
 
 router.get("/feed", isLoggedIn, async function (req, res, next) {
   const user = await userModel.findOne({ username: req.session.passport.user });
