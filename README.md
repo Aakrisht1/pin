@@ -4,6 +4,8 @@
 
 This is a Pinterest Clone using Node and ejs. It is a simple web application that allows users to upload images and view them in a grid also users can like on other posts. The images are stored in a MongoDB database.
 
+Hosted Link: https://pinterest-1hec.onrender.com/
+
 ## Setup
 
 1. Clone the repository
